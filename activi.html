@@ -19,7 +19,7 @@
             float: center;
             background-color: #a7042e;
             color: white;
-            width: auto;
+            width: 100%;
             height:100px; 
             padding-top: 60px;
             text-align: left;
@@ -31,7 +31,7 @@
         footer{
             float: center;
             background-color: black;
-            width: 100%;
+            width: 104%;
             height: 100px;
             padding-top: 60px;
             text-align: center;
@@ -49,7 +49,7 @@
         }
         
         .footer{
-            min-height: auto;
+            
     text-align: center;
         }
         .info{
@@ -103,6 +103,12 @@
         padding-left: 50px;
         padding-top: 20px;
      }
+
+        @media only screen and (max-width: 620px){
+    footer, header, .img, a, .a1, .pdf, .actividades,.info, .info1, .info2, .footer,  embed{
+        width: 100%;
+    }
+}
         
     </style>
 </head>
