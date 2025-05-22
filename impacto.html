@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora | Impacto Sostenible</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="shortcut icon" href="images/hoja.png" type="image/x-icon">
+
+</head>
+
+<body>
+
+     <header>
+  <div class="logo">
+    <h1>Impacto Sostenible</h1>
+  </div>
+  <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button> <!-- icono de hamburguesa -->
+  <div class="menu-container">
+    <nav class="navegacion">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="impacto.html">Calculadora</a></li>
+        <li><a href="conoce-mas.html">Conoce más</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+    <main class="contenedor">
+        <section class="formulario" id="formulario">
+            <h2>Calculadora de Impacto Sostenible</h2>
+            <p>Responde a las siguientes preguntas para conocer el impacto de tus hábitos en el medio ambiente.</p>
+
+            <form id="impactForm">
+                <div class="form-group">
+                    <label for="uso_auto">¿Cuántos kilómetros recorres en automóvil a la semana?</label>
+                    <input type="number" id="uso_auto" required />
+                </div>
+                <div class="form-group">
+                    <label for="consumo_carne">¿Cuántos días a la semana consumes carne?</label>
+                    <select id="consumo_carne" required>
+                        <option value="0">Nunca</option>
+                        <option value="2">1-2 días</option>
+                        <option value="4">3-4 días</option>
+                        <option value="6">5-6 días</option>
+                        <option value="7">Todos los días</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reciclaje">¿Reciclas tus residuos?</label>
+                    <select id="reciclaje" required>
+                        <option value="si">Sí</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="energia">¿Cuál es tu consumo promedio mensual de energía eléctrica?</label>
+                    <input type="number" id="energia" required />
+                </div>
+                <div class="form-group">
+                    <label for="ropa">¿Con qué frecuencia compras ropa nueva?</label>
+                    <select id="ropa" required>
+                        <option value="0">Casi nunca</option>
+                        <option value="2">Una vez al mes</option>
+                        <option value="4">Cada semana</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productos_locales">¿Consumes productos locales o de temporada?</label>
+                    <select id="productos_locales" required>
+                        <option value="0">Siempre</option>
+                        <option value="2">A veces</option>
+                        <option value="4">Nunca</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vuelos">¿Cuántos vuelos tomas al año?</label>
+                    <input type="number" id="vuelos" required />
+                </div>
+                <div class="form-group">
+                    <label for="basura">¿Cuánta basura generas semanalmente (en bolsas)?</label>
+                    <input type="number" id="basura" required />
+                </div>
+                <div class="form-group">
+                    <label for="bolsas">¿Utilizas bolsas reutilizables al hacer compras?</label>
+                    <select id="bolsas" required>
+                        <option value="0">Sí</option>
+                        <option value="3">A veces</option>
+                        <option value="5">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plantas">¿Tienes plantas o árboles en tu hogar o comunidad?</label>
+                    <select id="plantas" required>
+                        <option value="0">Sí</option>
+                        <option value="2">Pocos</option>
+                        <option value="4">No</option>
+                    </select>
+                </div>
+
+                <button type="submit">Calcular Impacto</button>
+
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%"></div>
+                </div>
+
+                <div>
+                    <h3>Recomendaciones:</h3>
+                    <ul id="recomendacionesList"></ul>
+                </div>
+            </form>
+    </main>
+
+    <!--Footer-->
+
+ <footer>
+  <div class="enlaces">
+    <a href="sobre_nosotros.html">Sobre nosotros</a>
+    <a href="contacto.html">Contacto</a>
+    <a href="politica.html">Política de privacidad</a>
+  </div>
+  <div class="redes-sociales">
+    <a href="https://www.facebook.com/" aria-label="Facebook" target="_blank">
+      <img src="images/facebooks.svg" alt="Facebook">
+    </a>
+    <a href="https://x.com/i/flow/login" aria-label="Twitter" target="_blank">
+      <img src="images/x.svg" alt="Twitter">
+    </a>
+    <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank">
+      <img src="images/instagram.svg" alt="Instagram">
+    </a>
+  </div>
+  <p>© 2025 Calculadora de Impacto Sostenible</p>
+</footer>
+        <script src="script.js"></script>
+        <script src="index.js"></script>
+</body>
+
+</html>
