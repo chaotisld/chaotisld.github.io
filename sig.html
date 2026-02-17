@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SITEP - Sistema de Información Territorial (SIG)</title>
+    <link href="IMG/favicon.ico" rel="icon" type="image/vnd.microsoft.icon">
+    <link href="CSS/styles.css" rel="stylesheet">
+    <script src="JS/accesibilidad.js" ></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* Variables de colores base */
+        :root{
+            --white: #fff;
+            --white-tenue: #f4f7f9;
+            --white-light: #f8f8f8;
+            --gris: #666666;
+            --gris-tenue:#555555;
+            --gris-tenue-light: #b2b2b1;
+            --gris-claro-tenue: #999;
+            --gris-claro: #ffffff59;
+            --gris-dark: #444;
+            --gris-claro-light: #888;
+            --black: #000000;
+            --black-tenue: #00000033;
+            --puebla-guinda: #5f1b2d;
+            --puebla-guinda-light: #861e34;
+            --puebla-oro: #c79b66;
+            --puebla-oscuro: #4e1022;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --max-width: 1415px;
+            --base-font-size: 16px;
+        }
+
+        html{
+            font-size: var(--base-font-size);
+            transition: font-size 0.2s ease-in;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white-tenue);
+            font-size: 1rem;
+        }
+
+        /* Arquitectura del header */
+        .main-header { background-color: var(--white); width: 100%; position: sticky; top: 0; z-index: 1000; box-shadow: 0px 4px 4px 0px var(--gris-claro); max-width: 1415px; margin: 0 auto; }
+        .main-content { background-color: var(--white); width: 100%; height: auto; position: relative; z-index: 0; margin: 0 auto; max-width: 1415px; box-shadow: 0 0 8px var(--gris-tenue-light); padding: 40px 20px 50px 20px; }
+        .logo-row { display: flex; justify-content: space-between; align-items: center; width: 100%; background-color: var(--white); position: relative; z-index:10; padding-left: 15px; box-shadow: 0px 8px 16px var(--black-tenue); }
+        .logo-container{ display: flex; justify-content: space-between; align-items: center; width:100%; max-width: 1415px; margin: 0 auto; }
+        .logos-left { display: flex; align-items: center; gap: 0px; }
+        .logos-left img { height: 130px; width: auto; }
+        .frase-right img { height: 122px; width: auto; padding-left: 150px; }
+        .nav-bar { background-color: var(--white); padding: 0 5%; width: 100%; display: flex; justify-content: center; align-items: center; height: 70px; position: relative; z-index: 5; box-shadow: 0 8px 16px var(--black-tenue); }
+        .nav-container{ display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1415px; }
+        .nav-menu > ul { display: flex; list-style: none; height: 100%; }
+        .nav-item { position: relative; height: 55px; display: flex; align-items: center; padding-left: 100px; padding: 0 15px; cursor: pointer; transition: all 0.3s ease; }
+        .nav-item > a { text-decoration: none; color: var(--gris); font-size: 0.9375rem; font-weight: 100; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hamburger{ display: none; cursor: pointer; }
+        .hamburger .line{ display: block; width: 25px; height: 3px; margin: 5px; background-color: var(--white); transition: all 0.3s ease; }
+        .submenu { display: none; position: absolute; top: 55px; left: 0; background-color: var(--white); min-width: 240px; list-style: none; box-shadow: 0 8px 16px var(--black-tenue); border-top: 3px solid var(--puebla-guinda); padding: 10px 0; z-index: 1000;}
+        .submenu li a { padding: 12px 20px; text-decoration: none; color: var(--gris-tenue); display: block; font-size: 0.8125rem; font-weight: 500; transition: background 0.2s; }
+        .submenu li a:hover { background-color: var(--white-light); color: var(--puebla-guinda-light); }
+        .nav-item:hover .submenu { display: block; }
+        .nav-item:hover > a { color: var(--puebla-guinda-light); }
+        .search-wrapper{ display: flex; align-items: center; background-color: var(--white); border: 1px solid var(--gris-tenue-light); border-radius: 20px; padding: 5px 15px; transition: var(--transition); }
+        .search-input{ border: none; outline: none; padding-left: 10px; padding: 4px 8px; font-size: 0.8125rem; color: var(--gris-dark); width: 140px; transition: width 0.4s ease; }	
+        .search-input:focus{ width: 220px; }	
+        .search-button{ background: none; border: none; cursor: pointer; display: flex; align-items: center; }
+        .search-button svg{ stroke: var(--gris-claro-light); }
+        .logos-right{ position: relative; display: flex; align-items: center; }
+        .logos-right img{ height: 100px; width: auto; padding-right: 20px; }
+
+        /* Estilos del Acordeón y Mapa SIG */
+        .acc-wrapper { width: 100%; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
+        .acc-item { border-bottom: 1px solid #ddd; }
+        .acc-item:last-child { border-bottom: none; }
+        .acc-header { width: 100%; background-color: #f9f9f9; color: var(--puebla-guinda); padding: 15px 20px; font-size: 1.1rem; font-weight: bold; text-align: left; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease; }
+        .acc-header:hover { background-color: #eee; }
+        .acc-header.active { background-color: #e0e0e0; border-bottom: 1px solid #ddd; }
+        .acc-icon { transition: transform 0.3s ease; font-size: 0.9rem; }
+        .acc-header.active .acc-icon { transform: rotate(180deg); }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: white; }
+        .acc-content-inner { padding: 20px; }
+        .dashboard-split-container { display: flex; flex-wrap: wrap; gap: 20px; }
+        .map-pane { flex: 1; min-width: 300px; }
+        .data-pane { width: 350px; max-height: 600px; overflow-y: auto; }
+        .data-title { margin-bottom: 5px; color: var(--puebla-guinda); }
+        .data-subtitle { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
+        .data-header-row { display: flex; justify-content: space-between; font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid #ddd; margin-bottom: 10px; font-size: 0.85rem; }
+        .region-list { list-style: none; padding: 0; margin: 0; }
+        .region-list li { display: flex; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .r-id { font-weight: bold; color: var(--puebla-guinda); width: 25px; }
+        .data-footer { margin-top: 20px; font-size: 0.8rem; color: #777; text-align: right; }
+        .btn-action.primary { background-color: var(--puebla-guinda); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-action.primary:hover { background-color: var(--puebla-guinda-light); }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: white; }
+        .status-badge.good { background-color: #28a745; }
+        .status-badge.yellow { background-color: #ffc107; color: #333; }
+
+        @media (max-width: 768px) {
+            .data-pane { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="logo-row">
+        <div class="logo-container">
+            <div class="logos-left">
+                <img src="IMG/logo_puebla_gob.svg" alt="Puebla Gobierno" loading="lazy">
+                <img src="IMG/DESARROLLO-SUSTENTABLE_02.png" alt="Desarrollo Sustentable" loading="lazy">
+            </div>
+            <div class="frase-right">
+                <img src="IMG/puebla_frases_gob.svg" alt="Por Amor a Puebla" loading="lazy">
+            </div>
+            <div class="logos-right">
+                <button class="btn-accesibilidad-trigger" onclick="toggleAccesibility()">
+                    <img id="logos-right" src="IMG/logo_accesibilidad.png" alt="Accesibilidad" loading="lazy">
+                </button>	
+            </div>
+        </div>
+    </div>
+    <nav class="nav-bar">
+        <div class="nav-container">        
+            <div class="nav-menu">
+                <ul>
+                    <li class="nav-item"><a href="index.html">Inicio</a></li>
+                    <li class="nav-item">
+                    <a href="desarrollo.html" id="nav-urban">Desarrollo Urbano</a>
+                        <ul class="submenu">
+                            <li><a href="desarrollo.html?cat=progrMetro">Programa Metropolitano</a></li>
+                        <li><a href="desarrollo.html?cat=progrEst" id="nav-sub-est">Programa Estatal</a></li>
+                            <li><a href="desarrollo.html?cat=munic">Municipios</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="gestion.html" >Gestión de suelos</a>
+                        <ul class="submenu">
+                            <li><a href="#">Subregionales</a></li>
+                            <li><a href="#">Ordenamiento ecológico</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="biodiversidad.html">Biodiversidad</a>
+                        <ul class="submenu">
+                            <li><a href="#">ANP</a></li>
+                            <li><a href="#">ADVC</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="sig.html" style="color: var(--puebla-guinda-light); font-weight: bold;">SIG</a></li>
+                </ul>
+            </div>
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Buscar..." aria-label="Buscar" id="buscador">
+                <button class="search-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="hamburger">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="main-content">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: var(--puebla-guinda); font-size: 2.2rem;">Sistema de Información Geográfica</h1>
+        <p style="color: var(--gris-tenue); margin-top: 10px;">Programa Estatal de Ordenamiento Territorial y Desarrollo Urbano del Estado de Puebla</p>
+    </div>
+
+    <section class="seccion-mapa" style="padding: 0;">
+        <div class="acc-wrapper" id="dashboard-main-container">
+            <div class="acc-item">
+                <button class="acc-header" id="btn-acc-mapa">
+                    <span>Regiones del Estado de Puebla</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content"> 
+                    <div class="acc-content-inner">
+                        <div class="dashboard-split-container">
+                            <div class="map-pane">
+                                <div id="mapa-puebla" style="width: 100%; height: 600px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1;"></div>
+                            </div>
+                            <div class="data-pane">
+                                <h3 class="data-title">DATOS</h3>
+                                <h4 class="data-subtitle">REGIONES DEL ESTADO DE PUEBLA</h4>
+                                <div class="data-header-row">
+                                    <span>CLAVE</span>
+                                    <span>NOMBRE DE LA REGIÓN</span>
+                                </div>
+                                <div class="region-list-container">
+                                    <ul class="region-list">
+                                        <li><span class="r-id">1</span> <span class="r-name">Xicotepec</span></li>
+                                        <li><span class="r-id">2</span> <span class="r-name">Huauchinango</span></li>
+                                        <li><span class="r-id">3</span> <span class="r-name">Zacatlán</span></li>
+                                        <li><span class="r-id">4</span> <span class="r-name">Huehuetla</span></li>
+                                        <li><span class="r-id">5</span> <span class="r-name">Zacapoaxtla</span></li>
+                                        <li><span class="r-id">6</span> <span class="r-name">Teziutlán</span></li>
+                                        <li><span class="r-id">7</span> <span class="r-name">Chignahuapan</span></li>
+                                        <li><span class="r-id">8</span> <span class="r-name">Libres</span></li>
+                                        <li><span class="r-id">9</span> <span class="r-name">Quimixtlán</span></li>
+                                        <li><span class="r-id">10</span> <span class="r-name">Acatzingo</span></li>
+                                        <li><span class="r-id">11</span> <span class="r-name">Ciudad Serdán</span></li>
+                                        <li><span class="r-id">12</span> <span class="r-name">Tecamachalco</span></li>
+                                        <li><span class="r-id">13</span> <span class="r-name">Tehuacán</span></li>
+                                        <li><span class="r-id">14</span> <span class="r-name">Sierra Negra</span></li>
+                                        <li><span class="r-id">15</span> <span class="r-name">Izúcar de Matamoros</span></li>
+                                        <li><span class="r-id">16</span> <span class="r-name">Chiautla</span></li>
+                                        <li><span class="r-id">17</span> <span class="r-name">Acatlán</span></li>
+                                        <li><span class="r-id">18</span> <span class="r-name">Tepexi de Rodríguez</span></li>
+                                        <li><span class="r-id">19</span> <span class="r-name">Atlixco</span></li>
+                                        <li><span class="r-id">20</span> <span class="r-name">San Martín Texmelucan</span></li>
+                                        <li><span class="r-id">21</span> <span class="r-name">San Miguel Canoa</span></li>
+                                        <li><span class="r-id">22</span> <span class="r-name">San Pablo Xochimehuacan</span></li>
+                                        <li><span class="r-id">23</span> <span class="r-name">La Libertad</span></li>
+                                        <li><span class="r-id">24</span> <span class="r-name">Heroica Puebla de Zaragoza</span></li>
+                                        <li><span class="r-id">25</span> <span class="r-name">San Baltazar Campeche</span></li>
+                                        <li><span class="r-id">26</span> <span class="r-name">San Francisco Totimehuacán</span></li>
+                                        <li><span class="r-id">27</span> <span class="r-name">Ignacio Zaragoza</span></li>
+                                        <li><span class="r-id">28</span> <span class="r-name">San Andrés Cholula</span></li>
+                                        <li><span class="r-id">29</span> <span class="r-name">San Pedro Cholula</span></li>
+                                        <li><span class="r-id">30</span> <span class="r-name">Cuautlancingo</span></li>
+                                        <li><span class="r-id">31</span> <span class="r-name">Amozoc</span></li>
+                                        <li><span class="r-id">32</span> <span class="r-name">Tepeaca</span></li>
+                                    </ul>
+                                </div>
+                                <div class="data-footer">
+                                    <small>FUENTE DE INFORMACIÓN: Plan Estatal de Desarrollo</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-item">
+                <button class="acc-header">
+                    <span>Programas Subregionales</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content">
+                    <div class="acc-content-inner">
+                        <h3 style="color: var(--puebla-guinda); margin-bottom: 20px;">Programas Subregionales Vigentes</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #eee;">
+                                <h4 style="color: #333;">Subregión Norte</h4>
+                                <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Instrumentos de ordenamiento para la Sierra Norte.</p>
+                                <button class="btn-action primary" style="width: 100%;">Ver Detalles</button>
+                            </div>
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #eee;">
+                                <h4 style="color: #333;">Subregión Mixteca</h4>
+                                <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Estrategias de desarrollo territorial zona Mixteca.</p>
+                                <button class="btn-action primary" style="width: 100%;">Ver Detalles</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-item">
+                <button class="acc-header">
+                    <span>Municipios con Instrumentos</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content">
+                    <div class="acc-content-inner">
+                        <h3 style="color: var(--puebla-guinda);">Listado de Municipios con PMDU</h3>
+                        <table style="width: 100%; border-collapse: collapse; background: white; margin-top: 20px;">
+                            <thead style="background: var(--puebla-guinda); color: white;">
+                                <tr>
+                                    <th style="padding: 10px; text-align: left;">Municipio</th>
+                                    <th style="padding: 10px; text-align: left;">Estado</th>
+                                    <th style="padding: 10px; text-align: left;">Año Publicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #ddd;">
+                                    <td style="padding: 10px;">Puebla</td>
+                                    <td style="padding: 10px;"><span class="status-badge good">Vigente</span></td>
+                                    <td style="padding: 10px;">2024</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #ddd;">
+                                    <td style="padding: 10px;">San Andrés Cholula</td>
+                                    <td style="padding: 10px;"><span class="status-badge yellow">En Actualización</span></td>
+                                    <td style="padding: 10px;">2018</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #ddd;">
+                                    <td style="padding: 10px;">Atlixco</td>
+                                    <td style="padding: 10px;"><span class="status-badge good">Vigente</span></td>
+                                    <td style="padding: 10px;">2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="acc-item">
+                <button class="acc-header">
+                    <span>Tipo de Instrumentos</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content">
+                    <div class="acc-content-inner" style="text-align: center;">
+                        <h3 style="color: var(--puebla-guinda);">Clasificación de Instrumentos</h3>
+                        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
+                            <div style="width: 200px; padding: 20px; background: white; border-top: 5px solid #c79b66; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h1 style="font-size: 3rem; color: #555; margin: 0;">12</h1>
+                                <p>Planes Municipales</p>
+                            </div>
+                            <div style="width: 200px; padding: 20px; background: white; border-top: 5px solid var(--puebla-guinda); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h1 style="font-size: 3rem; color: #555; margin: 0;">3</h1>
+                                <p>Planes Metropolitanos</p>
+                            </div>
+                            <div style="width: 200px; padding: 20px; background: white; border-top: 5px solid #444; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h1 style="font-size: 3rem; color: #555; margin: 0;">5</h1>
+                                <p>Ordenamientos Ecológicos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-branding">
+            <img src="IMG/Escudo_pie.svg" alt="Gobierno de Puebla" class="footer-logo-main" loading="lazy">
+        </div>
+        <ul class="footer-links-col">
+            <li> <a href="https://planeader.puebla.gob.mx/"> PLAN ESTATAL DE DESARROLLO </a> </li>
+            <li> <a href=""> PERIÓDICO OFICIAL DEL ESTADO</a> </li>
+        </ul>
+    </div>	
+    <img src="IMG/footer_puebla_gob_2025_des.svg" class="cop" loading="lazy" />
+</footer>
+
+<script src="JS/menu_resp.js"></script>
+<script src="JS/busqueda.js"></script>
+<script src="JS/mapa.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. LÓGICA DEL ACORDEÓN
+    const headers = document.querySelectorAll('.acc-header');
+    headers.forEach(header => {
+        header.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                // Refrescar tamaño del mapa de Leaflet si se abre su acordeón
+                if (this.id === 'btn-acc-mapa' && window.miMapaPuebla) {
+                    setTimeout(() => { window.miMapaPuebla.invalidateSize(); }, 300);
+                }
+            }
+        });
+    });
+
+    // Abrimos el primer acordeón (el del mapa) por defecto al cargar
+    setTimeout(() => {
+        const primerHeader = document.getElementById('btn-acc-mapa');
+        if (primerHeader) {
+            primerHeader.classList.add('active');
+            const primerContent = primerHeader.nextElementSibling;
+            primerContent.style.maxHeight = primerContent.scrollHeight + "px";
+        }
+    }, 50);
+
+    // 2. LÓGICA DEL MAPA (Leaflet)
+    const centroPuebla = [19.0414, -98.2063];
+    const zoomInicial = 8;
+    let regionSeleccionadaId = null; 
+
+    const coordenadasRegiones = {
+        "1": [20.2717, -97.9611], "2": [20.1736, -98.0569], "3": [19.9319, -97.9614],
+        "4": [20.1106, -97.6253], "5": [19.8661, -97.5847], "6": [19.8173, -97.3595],
+        "7": [19.8369, -98.0319], "8": [19.4658, -97.6894], "9": [19.2458, -97.1406],
+        "10": [18.9817, -97.7128], "11": [19.0622, -97.4447], "12": [18.8897, -97.6683],
+        "13": [18.4631, -97.3930], "14": [18.3300, -97.0800], "15": [18.6014, -98.4636],
+        "16": [18.3031, -98.6031], "17": [18.2017, -98.0483], "18": [18.4744, -97.9258],
+        "19": [18.9022, -98.4406], "20": [19.2844, -98.4344], "21": [19.1488, -98.1015],
+        "22": [19.0934, -98.2007], "23": [18.8566, -98.4154], "24": [19.0414, -98.2063], 
+        "25": [19.0224, -98.2959], "26": [18.9748, -98.1957], "27": [19.0289, -98.1794],
+        "28": [19.0600, -98.2949], "29": [19.0576, -98.3053], "30": [19.0972, -98.2720],
+        "31": [19.0450, -98.0417], "32": [18.9139, -97.8967]
+    };
+
+    setTimeout(() => {
+        if (!document.getElementById('mapa-puebla')) return;
+
+        var map = L.map('mapa-puebla').setView(centroPuebla, zoomInicial);
+        window.miMapaPuebla = map;      
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; CARTO',
+            maxZoom: 19
+        }).addTo(map);
+
+        const markerGroup = L.featureGroup().addTo(map);
+
+        fetch("https://raw.githubusercontent.com/phantom-zone/mexico-geojson/main/2022/21_puebla/Puebla.json")
+            .then(res => res.json())
+            .then(data => {
+                window.geojsonLayer = L.geoJson(data, {
+                    style: { fillColor: 'var(--puebla-guinda)', weight: 1, opacity: 1, color: 'white', fillOpacity: 0.3 },
+                    onEachFeature: (feature, layer) => {
+                        layer.on({
+                            mouseover: (e) => { e.target.setStyle({ fillOpacity: 0.6, weight: 2 }); },
+                            mouseout: (e) => { window.geojsonLayer.resetStyle(e.target); }
+                        });
+                    }
+                }).addTo(map);
+            });
+
+        const regionItems = document.querySelectorAll('.region-list li');
+        
+        regionItems.forEach(item => {
+            const id = item.querySelector('.r-id').textContent;
+            const nombre = item.querySelector('.r-name').textContent;
+
+            if (coordenadasRegiones[id]) {
+                const marker = L.circleMarker(coordenadasRegiones[id], {
+                    radius: 6, fillColor: "#c79b66", color: "#5f1b2d", weight: 2, opacity: 1, fillOpacity: 0.8
+                }).addTo(markerGroup);
+                
+                marker.bindPopup(`<b>Región ${id}: ${nombre}</b>`);
+
+                item.style.cursor = "pointer";
+                item.style.transition = "background 0.3s";
+
+                item.addEventListener('click', () => {
+                    if (regionSeleccionadaId === id) {
+                        map.flyTo(centroPuebla, zoomInicial, { duration: 1.5 });
+                        map.closePopup();
+                        item.style.backgroundColor = "transparent";
+                        regionSeleccionadaId = null;
+                    } else {
+                        map.flyTo(coordenadasRegiones[id], 12, { duration: 1.5 });
+                        marker.openPopup();
+                        regionItems.forEach(i => i.style.backgroundColor = "transparent");
+                        item.style.backgroundColor = "rgba(199, 155, 102, 0.3)";
+                        regionSeleccionadaId = id;
+                    }
+                });
+            }
+        });
+    }, 200);
+});
+</script>
+</body>
+</html>
