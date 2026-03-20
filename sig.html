@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SITEP - Sistema de Información Territorial (SIG)</title>
+    <link href="IMG/favicon.ico" rel="icon" type="image/vnd.microsoft.icon">
+    <link href="CSS/styles.css" rel="stylesheet">
+    <script src="JS/accesibilidad.js" ></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* Variables de colores base */
+        :root{
+            --white: #fff;
+            --white-tenue: #f4f7f9;
+            --white-light: #f8f8f8;
+            --gris: #666666;
+            --gris-tenue:#555555;
+            --gris-tenue-light: #b2b2b1;
+            --gris-claro-tenue: #999;
+            --gris-claro: #ffffff59;
+            --gris-dark: #444;
+            --gris-claro-light: #888;
+            --black: #000000;
+            --black-tenue: #00000033;
+            --puebla-guinda: #5f1b2d;
+            --puebla-guinda-light: #861e34;
+            --puebla-oro: #c79b66;
+            --puebla-oscuro: #4e1022;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --max-width: 1415px;
+            --base-font-size: 16px;
+        }
+
+        html{
+            font-size: var(--base-font-size);
+            transition: font-size 0.2s ease-in;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white-tenue);
+            font-size: 1rem;
+        }
+
+        /* Arquitectura del header */
+        .main-header { background-color: var(--white); width: 100%; position: sticky; top: 0; z-index: 1000; box-shadow: 0px 4px 4px 0px var(--gris-claro); max-width: 1415px; margin: 0 auto; }
+        .main-content { background-color: var(--white); width: 100%; height: auto; position: relative; z-index: 0; margin: 0 auto; max-width: 1415px; box-shadow: 0 0 8px var(--gris-tenue-light); padding: 40px 20px 50px 20px; }
+        .logo-row { display: flex; justify-content: space-between; align-items: center; width: 100%; background-color: var(--white); position: relative; z-index:10; padding-left: 15px; box-shadow: 0px 8px 16px var(--black-tenue); }
+        .logo-container{ display: flex; justify-content: space-between; align-items: center; width:100%; max-width: 1415px; margin: 0 auto; }
+        .logos-left { display: flex; align-items: center; gap: 0px; }
+        .logos-left img { height: 130px; width: auto; }
+        .frase-right img { height: 122px; width: auto; padding-left: 200px; }
+        .nav-bar { background-color: var(--white); padding: 0 5%; width: 100%; display: flex; justify-content: center; align-items: center; height: 70px; position: relative; z-index: 5; box-shadow: 0 8px 16px var(--black-tenue); }
+        .nav-container{ display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1415px; }
+        .nav-menu > ul { display: flex; list-style: none; height: 100%; }
+        .nav-item { position: relative; height: 55px; display: flex; align-items: center; padding-left: 100px; padding: 0 15px; cursor: pointer; transition: all 0.3s ease; }
+        .nav-item > a { text-decoration: none; color: var(--gris); font-size: 0.9375rem; font-weight: 100; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hamburger{ display: none; cursor: pointer; }
+        .hamburger .line{ display: block; width: 25px; height: 3px; margin: 5px; background-color: var(--white); transition: all 0.3s ease; }
+        .submenu { display: none; position: absolute; top: 55px; left: 0; background-color: var(--white); min-width: 240px; list-style: none; box-shadow: 0 8px 16px var(--black-tenue); border-top: 3px solid var(--puebla-guinda); padding: 10px 0; z-index: 1000;}
+        .submenu li a { padding: 12px 20px; text-decoration: none; color: var(--gris-tenue); display: block; font-size: 0.8125rem; font-weight: 500; transition: background 0.2s; }
+        .submenu li a:hover { background-color: var(--white-light); color: var(--puebla-guinda-light); }
+        .nav-item:hover .submenu { display: block; }
+        .nav-item:hover > a { color: var(--puebla-guinda-light); }
+        .search-wrapper{ display: flex; align-items: center; background-color: var(--white); border: 1px solid var(--gris-tenue-light); border-radius: 20px; padding: 5px 15px; transition: var(--transition); }
+        .search-input{ border: none; outline: none; padding-left: 10px; padding: 4px 8px; font-size: 0.8125rem; color: var(--gris-dark); width: 140px; transition: width 0.4s ease; }	
+        .search-input:focus{ width: 220px; }	
+        .search-button{ background: none; border: none; cursor: pointer; display: flex; align-items: center; }
+        .search-button svg{ stroke: var(--gris-claro-light); }
+        .logos-right{ position: relative; display: flex; align-items: center; }
+        .logos-right img{ height: 100px; width: auto; padding-right: 20px; }
+
+        /* Estilos del Acordeón y Mapa SIG */
+        .acc-wrapper { width: 100%; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
+        .acc-item { border-bottom: 1px solid #ddd; }
+        .acc-item:last-child { border-bottom: none; }
+        .acc-header { width: 100%; background-color: #f9f9f9; color: var(--puebla-guinda); padding: 15px 20px; font-size: 1.1rem; font-weight: bold; text-align: left; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease; }
+        .acc-header:hover { background-color: #eee; }
+        .acc-header.active { background-color: #e0e0e0; border-bottom: 1px solid #ddd; }
+        .acc-icon { transition: transform 0.3s ease; font-size: 0.9rem; }
+        .acc-header.active .acc-icon { transform: rotate(180deg); }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: white; }
+        .acc-content-inner { padding: 20px; }
+        .dashboard-split-container { display: flex; flex-wrap: wrap; gap: 20px; }
+        .map-pane { flex: 1; min-width: 300px; }
+        .data-pane { width: 350px; max-height: 600px; overflow-y: auto; }
+        .data-title { margin-bottom: 5px; color: var(--puebla-guinda); }
+        .data-subtitle { font-size: 0.9rem; color: #555; margin-bottom: 15px; }
+        .data-header-row { display: flex; justify-content: space-between; font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid #ddd; margin-bottom: 10px; font-size: 0.85rem; }
+        .region-list { list-style: none; padding: 0; margin: 0; }
+        .region-list li { display: flex; gap: 10px; padding: 8px 5px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .r-id { font-weight: bold; color: var(--puebla-guinda); width: 25px; }
+        .data-footer { margin-top: 20px; font-size: 0.8rem; color: #777; text-align: right; }
+        .btn-action.primary { background-color: var(--puebla-guinda); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-action.primary:hover { background-color: var(--puebla-guinda-light); }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: white; }
+        .status-badge.good { background-color: #28a745; }
+        .status-badge.yellow { background-color: #ffc107; color: #333; }
+
+        @media (max-width: 768px) {
+            .data-pane { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="logo-row">
+        <div class="logo-container">
+            <div class="logos-left">
+                <img src="IMG/logo_puebla_gob.svg" alt="Puebla Gobierno" loading="lazy">
+                <img src="IMG/DESARROLLO-SUSTENTABLE_02.png" alt="Desarrollo Sustentable" loading="lazy">
+            </div>
+            <div class="frase-right">
+                <img src="IMG/puebla_frases_gob.svg" alt="Por Amor a Puebla" loading="lazy">
+            </div>
+            <div class="logos-right">
+                <button class="btn-accesibilidad-trigger" onclick="toggleAccesibility()">
+                    <img id="logos-right" src="IMG/logo_accesibilidad.png" alt="Accesibilidad" loading="lazy">
+                </button>	
+            </div>
+        </div>
+    </div>
+    <nav class="nav-bar">
+        <div class="nav-container">        
+            <div class="nav-menu">
+                <ul>
+                    <li class="nav-item"><a href="index.html">Inicio</a></li>
+                    <li class="nav-item">
+                    <a href="desarrollo.html" id="nav-urban">Desarrollo Urbano</a>
+                        <ul class="submenu">
+                            <li><a href="desarrollo.html?cat=progrMetro">Programa Metropolitano</a></li>
+                        <li><a href="desarrollo.html?cat=progrEst" id="nav-sub-est">Programa Estatal</a></li>
+                            <li><a href="desarrollo.html?cat=munic">Municipios</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="gestion.html" >Gestión de suelos</a>
+                        <ul class="submenu">
+                            <li><a href="#">Subregionales</a></li>
+                            <li><a href="#">Ordenamiento ecológico</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="biodiversidad.html">Biodiversidad</a>
+                        <ul class="submenu">
+                            <li><a href="#">ANP</a></li>
+                            <li><a href="#">ADVC</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a href="sig.html" style="color: var(--puebla-guinda-light); font-weight: bold;">SIG</a></li>
+                </ul>
+            </div>
+
+                    <script src="JS/panel_acciones.js"></script>
+
+
+            <!-- ######################### Boton de QR ######################### -->
+    <button class="qr-btn-trigger" onclick="toggleQRModal()" title="Generar código QR de esta página" aria-label="Generar QR">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <path d="M3 14h7v7H3z"></path>
+        <path d="M10 10h4v4h-4z" fill="currentColor" stroke="none"></path> 
+    </svg>
+</button>
+
+<button class="lang-btn-trigger" id="btn-lang" onclick="toggleLanguage()" title="Cambiar idioma / Change language" aria-label="Cambiar idioma">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>
+    <span id="lang-text" style="font-size: 10px; font-weight: bold; margin-left: 2px;">ES</span>
+</button>
+
+<button class="chat-btn-trigger" onclick="toggleChat()" title="Asistente Virtual" aria-label="Chatbot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+</button>
+
+<div id="chatModal" class="chat-window">
+    <div class="chat-header">
+        <div class="chat-title">
+            <span>🤖</span> Asistente SITEP
+        </div>
+        <button class="chat-close" onclick="toggleChat()">✖</button>
+    </div>
+    
+    <div class="chat-body" id="chatBody">
+        <div class="message bot-msg">
+            <p>¡Hola! Soy el asistente virtual del SITEP. ¿En qué tema tienes dudas?</p>
+        </div>
+        </div>
+
+<div class="chat-options" id="chatOptions"></div>
+
+<div class="chat-input-area">
+    <input type="text" id="userInput" placeholder="Escribe tu duda aquí..." onkeypress="checkEnter(event)">
+    <button onclick="handleUserText()" class="send-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+        </svg>
+    </button>
+</div>
+</div>
+
+
+
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Buscar..." aria-label="Buscar" id="buscador">
+                <button class="search-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="hamburger">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="main-content">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: var(--puebla-guinda); font-size: 2.2rem;">Sistema de Información Geográfica</h1>
+        <p style="color: var(--gris-tenue); margin-top: 10px;">Programa Estatal de Ordenamiento Territorial y Desarrollo Urbano del Estado de Puebla</p>
+    </div>
+
+    <section class="seccion-mapa" style="padding: 0;">
+        <div class="acc-wrapper" id="dashboard-main-container">
+            
+<div class="acc-item">
+    <button class="acc-header" id="btn-acc-mapa">
+        <span>Regiones del Estado de Puebla</span>
+        <span class="acc-icon">▼</span>
+    </button>
+    <div class="acc-content"> 
+        <div class="acc-content-inner">
+            
+            <div class="tabs-container" id="mapa-tabs">
+                <button class="tab-btn active" data-tab="estado">Estado de Puebla</button>
+                <button class="tab-btn" data-tab="macro">Macroregiones</button>
+                <button class="tab-btn" data-tab="micro">Microregiones</button>
+                <button class="tab-btn" data-tab="municipios">Municipios</button>
+            </div>
+            <div class="dashboard-split-container">
+                <div class="map-pane">
+                    <div id="mapa-puebla" style="width: 100%; height: 600px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1;"></div>
+                </div>
+<div class="data-pane" id="panel-datos-dinamico">
+    
+    <div id="pane-estado" class="tab-content-pane">
+        <h3 class="data-title">DATOS ESTATALES</h3>
+        <h4 class="data-subtitle">ESTADO DE PUEBLA</h4>
+        <div style="background: var(--white-light); padding: 15px; border-radius: 6px; border-left: 4px solid var(--puebla-guinda);">
+            <ul style="list-style: none; padding: 0; line-height: 2.2; color: var(--gris-dark); font-size: 0.95rem;">
+                <li><b>Población total:</b> 6,583,278 hab.</li>
+                <li><b>Total de Municipios:</b> 217</li>
+                <li><b>Superficie territorial:</b> 34,290 km²</li>
+                <li><b>Capital:</b> Heroica Puebla de Zaragoza</li>
+            </ul>
+        </div>
+        <div class="data-footer" style="margin-top: 20px;">
+            <small>FUENTE DE INFORMACIÓN: INEGI 2020</small>
+        </div>
+    </div>
+
+    <div id="pane-macro" class="tab-content-pane" style="display: none;">
+        <h3 class="data-title">DATOS</h3>
+        <h4 class="data-subtitle">MACROREGIONES</h4>
+        <div class="data-header-row">
+            <span>CLAVE</span>
+            <span>NOMBRE DE LA REGIÓN</span>
+        </div>
+        <div class="region-list-container">
+            <ul class="region-list" id="lista-regiones-dinamica"></ul>
+        </div>
+    </div>
+
+    <div id="pane-micro" class="tab-content-pane" style="display: none;">
+        <h3 class="data-title">DATOS</h3>
+        <h4 class="data-subtitle">MICROREGIONES</h4>
+        <p style="color: var(--gris-claro-light); font-size: 0.9rem; margin-top: 15px;">Seleccione una microregión en el mapa para visualizar sus indicadores territoriales.</p>
+        <div class="data-header-row">
+            <span>CLAVE</span>
+            <span>NOMBRE DE LA REGIÓN</span>
+        </div>
+        <div class="region-list-container">
+            <ul class="region-list" id="lista-microregiones-dinamica"></ul>
+        </div>
+    </div>
+
+    <div id="pane-municipios" class="tab-content-pane" style="display: none;">
+        <h3 class="data-title">DATOS</h3>
+        <h4 class="data-subtitle">MUNICIPIOS</h4>
+        <p style="color: var(--gris-claro-light); font-size: 0.9rem; margin-top: 15px;">Seleccione un municipio en el mapa para ver su información demográfica y urbana.</p>
+    </div>
+
+</div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="acc-item">
+                <button class="acc-header">
+                    <span>Programas Subregionales</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content">
+                    <div class="acc-content-inner">
+                        <h3 style="color: var(--puebla-guinda); margin-bottom: 20px;">Programas Subregionales Vigentes</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;" id="grid-subregionales">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<div class="acc-item">
+                <button class="acc-header">
+                    <span>Planes y Programas</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content">
+                    <div class="acc-content-inner">
+
+                        <h3 style="color: var(--puebla-guinda); margin-top: 40px;">Instrumentos Estatales, Interestatales y Regionales</h3>
+                        <table style="width: 100%; border-collapse: collapse; background: white; margin-top: 15px;">
+                            <thead style="background: var(--puebla-guinda); color: white;">
+                                <tr>
+                                    <th style="padding: 10px; text-align: left;">Instrumento de Planeación</th>
+                                    <th style="padding: 10px; text-align: left;">Estatus</th>
+                                    <th style="padding: 10px; text-align: left;">Tipo</th>
+                                    <th style="padding: 10px; text-align: left;">Año Publicación</th>
+                                    <th style="padding: 10px; text-align: left;">Visualizar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-est-inter-regio"></tbody>
+                        </table>
+
+                        
+                        <h3 style="color: var(--puebla-guinda);">Instrumentos Municipales Vigentes</h3>
+                        
+                        <div style="display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
+                            <input type="text" id="buscador-municipios" placeholder="Buscar por municipio o año..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; min-width: 200px; font-size: 0.95rem;">
+
+                            <select id="filtro-municipios" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; background-color: white; color: var(--gris-dark);">
+    <option value="a-z">Ordenar: A - Z</option>
+    <option value="z-a">Ordenar: Z - A</option>
+    <option value="año-desc">Año: Más reciente primero</option>
+    <option value="año-asc">Año: Más antiguo primero</option>
+    <option value="estado-vigente">Estado: Vigentes primero</option>
+    <option value="estado-proceso">Estado: En proceso primero</option>
+</select>
+                            
+                            
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; background: white;">
+                            <thead style="background: var(--puebla-guinda); color: white;">
+                                <tr>
+                                    <th style="padding: 10px; text-align: left;">Municipio</th>
+                                    <th style="padding: 10px; text-align: left;">Estatus</th>
+                                    <th style="padding: 10px; text-align: left;">Año Publicación</th>
+                                    <th style="padding: 10px; text-align: left;">Visualizar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-municipios"></tbody>
+                        </table>
+
+                        <h3 style="color: var(--puebla-guinda); margin-top: 40px;">Instrumentos Municipales en proceso de elaboración</h3>
+                        <table style="width: 100%; border-collapse: collapse; background: white; margin-top: 15px;">
+                            <thead style="background: var(--puebla-guinda); color: white;">
+                                <tr>
+                                    <th style="padding: 10px; text-align: left;">Municipio</th>
+                                    <th style="padding: 10px; text-align: left;">Estatus</th>
+                                    <th style="padding: 10px; text-align: left;"> Link </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-enproceso"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="acc-item">
+                <button class="acc-header">
+                    <span>Tipo de Instrumentos</span>
+                    <span class="acc-icon">▼</span>
+                </button>
+                <div class="acc-content">
+                    <div class="acc-content-inner" style="text-align: center;">
+                        <h3 style="color: var(--puebla-guinda);">Clasificación de Instrumentos</h3>
+                        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap;" id="contenedor-instrumentos">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+
+<footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-branding">
+            <img src="IMG/Escudo_pie.svg" alt="Gobierno de Puebla" class="footer-logo-main" loading="lazy">
+        </div>
+        <ul class="footer-links-col">
+            <li> <a href="https://planeader.puebla.gob.mx/"> PLAN ESTATAL DE DESARROLLO </a> </li>
+            <li> <a href=""> PERIÓDICO OFICIAL DEL ESTADO</a> </li>
+        </ul>
+    </div>	
+    <img src="IMG/footer_puebla_gob_2025_des.svg" class="cop" loading="lazy" />
+</footer>
+
+<script src="JS/menu_resp.js"></script>
+<script src="JS/busqueda.js"></script>
+<script src="JS/mapa.js"></script>
+<script src="JS/capa_munic.js"></script>
+<script src="JS/sig_dinamico.js"></script>
+<script src="estado.js"></script>
+
+
+
+</body>
+</html>

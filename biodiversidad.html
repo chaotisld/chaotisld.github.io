@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SITEP - Sistema de Información Territorial</title>
+    <link href="IMG/favicon.ico" rel="icon" type="image/vnd.microsoft.icon">
+    <link href="CSS/styles.css" rel="stylesheet">
+	<script src="JS/accesibilidad.js" ></script>
+
+    <style>
+		:root{
+			--white: #fff;
+			--white-tenue: #f4f7f9;
+			--white-light: #f8f8f8;
+			--gris: #666666;
+			--gris-tenue:#555555;
+			--gris-tenue-light: #b2b2b1;
+			--gris-claro-tenue: #999;
+			--gris-claro: #ffffff59;
+			--gris-dark: #444;
+			--gris-claro-light: #888;
+			--black: #000000;
+			--black-tenue: #00000033;
+			--puebla-guinda: #5f1b2d;
+			--puebla-guinda-light: #861e34;
+	   		--puebla-oro: #c79b66;
+	   		--puebla-oscuro: #4e1022;
+			--transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			--max-width: 1415px;
+			--base-font-size: 16px;
+		}
+
+		/* esto permite que el JS, controle todo el sitio*/
+
+		html{
+			font-size: var(--base-font-size);
+			transition: font-size 0.2s ease-in;
+		}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white-tenue);
+			font-size: 1rem;
+        }
+
+	/*Arquitectua del header*/
+
+        .main-header {
+        	background-color: var(--white);
+        	width: 100%;
+        	position: sticky;
+	    	top: 0;
+        	z-index: 1000;
+	    	box-shadow: 0px 4px 4px 0px var(--gris-claro);
+	    	max-width: 1415px;
+	    	margin: 0 auto;
+	 
+        }
+
+		.main-content{
+			background-color: var(--white);
+			width: 100%;
+			height: auto;
+			position: sticky;
+			z-index: 0;
+			margin: 0 auto;
+			max-width: 1415px;
+			box-shadow: 0 0 8px var(--gris-tenue-light);
+            padding-bottom: 50px;
+            padding-top: 5px;
+
+		}
+
+        /* Fila Superior: Logotipos */
+        .logo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+	   		width: 100%;
+	    	background-color: var(--white);
+	    	position: relative;
+	    	z-index:10;
+	    	padding-left: 15px;
+	    	box-shadow: 0px 8px 16px var(--black-tenue);
+        }
+
+	/*Contenedor interno para mantener el ancho máximo*/
+	
+		.logo-container{
+	    	display: flex;
+	    	justify-content: space-between;
+	    	align-items: center;
+	    	width:100%;
+	    	max-width: 1415px;
+	    	margin: 0 auto;
+		}
+
+        .logos-left {
+            display: flex;
+            align-items: center;
+            gap: 0px;
+        }
+
+        .logos-left img {
+	    height: 130px;
+	    width: auto;
+    
+        }
+
+        .frase-right img {
+            height: 122px;
+            width: auto;
+	    	padding-left: 200px;
+        }
+
+        /* Fila Inferior: Barra de Navegación */
+        .nav-bar {
+	    	background-color: var(--white);
+            padding: 0 5%;
+	   		width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70px;
+	    	position: relative;
+	    	z-index: 5;
+	   	 	box-shadow: 0 8px 16px var(--black-tenue);
+            padding-top: 0px;
+        }
+
+	.nav-container{
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    width: 100%;
+	    max-width: 1415px;
+	}
+
+        .nav-menu > ul {
+            display: flex;
+            list-style: none;
+            height: 100%;
+        }
+
+        /* Elementos principales del menú */
+        .nav-item {
+            position: relative; 
+            height: 55px;
+            display: flex;
+            align-items: center;
+			padding-left: 100px;
+            padding: 0 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--gris);
+            font-size: 0.9375rem;
+			font-weight: 100;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+		.hamburger{
+			display: none;
+			cursor: pointer;
+		}
+
+
+		.hamburger .line{
+			display: block;
+			width: 25px;
+			height: 3px;
+			margin: 5px;
+			background-color: var(--white);
+			transition: all 0.3s ease;
+            
+		}
+
+@media screen and (max-width: 1244px){
+
+    .logos-right img{
+        width: 0px;
+        height: auto;
+        
+    }
+
+    .frase-right img{
+        width: 0px;
+        height: 0px;
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .qr-btn-trigger button{
+        padding-right: auto;
+    }
+
+    .search-input input{
+        padding-right: 100px;
+    }
+
+
+}
+
+
+
+@media screen and (max-width: 375px) {
+    .logos-left{
+        width: 100px;
+    }
+
+    .logos-right{
+        padding-left: 170px;
+        padding-top: 5px;
+    }
+        .search-wrapper {
+        height: 30px;
+        width: 90px;
+    }
+
+    .search-button svg{
+        display: none;
+    }
+
+    
+}
+
+        /*parte responsiva del panel principal*/
+
+@media screen and (max-width: 768px) {
+
+    .logo-container{
+        width: 100%;
+        padding: 0 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+	.logos-left img{
+		width: 150px;
+		height: auto;
+	}
+
+    .frase-right{
+        display: none;
+    }
+
+    .logos-right img{
+        height: 60px;
+        width: auto;
+        padding-right: auto !important;
+    }
+
+    #logos-right{
+        width: 95px;
+        height: auto;
+        padding-right: auto;
+    }
+
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        position: relative;
+    }
+
+    .hamburger {
+        display: block;
+        cursor: pointer;
+        z-index: 2000; 
+        margin-left: 15px;
+    }
+
+    .hamburger .line {
+        width: 25px;
+        height: 3px;
+        background-color: #000; 
+        margin: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .hamburger.toggle .line:nth-child(1) {
+        transform: translate(-5px, 6px) rotate(-45deg);
+        background-color: var(--puebla-guinda);
+    }
+    .hamburger.toggle .line:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.toggle .line:nth-child(3) {
+        transform: translate(-5px, -6px) rotate(45deg);
+        background-color: var(--puebla-guinda);
+    }
+
+    
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%; 
+        width: 70%; 
+        height: 100vh; 
+        background-color: var(--white);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 130px;
+		padding-left: 20px;
+        transition: 0.4s ease; 
+        box-shadow: -2px 0 5px #00000033;
+        z-index: 1500;
+    }
+
+    .nav-menu.active {
+        right: 0; 
+    }
+
+    .nav-menu ul {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav-item {
+        padding: 20px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .nav-item:hover .submenu{
+        width: 50px;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .doc-info h3{
+		font-size: 20px;
+		
+	}
+	.doc-meta{
+	color: var(--puebla-guinda);
+	font-weight: bold;
+	font-size: 12.5px;
+	padding: 4px 15px;
+	border: 1px solid var(--puebla-guinda);
+	border-radius: 4px;
+	transition: background 0.3s, color 0.3s;
+	padding-top: 5px;
+	}
+    
+    .newsletter-section{
+        height: 300px;
+    }
+
+    .newsletter-form button{
+        height: 50px;
+    }
+
+    .newsletter-form input{
+        width: 30px;
+        height: 50px
+    }
+
+    .btn-download{
+        padding-left: 6px;
+    }
+
+
+}			
+
+        /* sunmenu despegable */
+        .submenu {
+	    display: none;
+	    position: absolute;
+	    top: 55px;
+	    left: 0;
+	    background-color: var(--white);
+	    min-width: 240px;
+	    list-style: none;
+	    box-shadow: 0 8px 16px var(--black-tenue);
+	    border-top: 3px solid var(--puebla-guinda);
+	    padding: 10px 0;
+        }
+
+        .submenu li a {
+	   padding: 12px 20px;
+	   text-decoration: none;
+	   color: var(--gris-tenue);
+	   display: block;
+	   font-size: 0.8125rem;
+	   font-weight: 500;
+	   transition: background 0.2s;
+    
+        }
+
+        .submenu li a:hover {
+            background-color: var(--white-light);
+            color: var(--puebla-guinda-light);
+        }
+
+        .nav-item:hover .submenu {
+            display: block; /* Muestra el submenú al pasar el cursor */
+        }
+
+        .nav-item:hover > a {
+            color: var(--puebla-guinda-light);
+        }
+
+        /*estilos del buscador*/
+	
+	.search-wrapper{
+	    display: flex;
+	    align-items: center;
+	    background-color: var(--white);
+	    border: 1px solid var(--gris-tenue-light);
+	    border-radius: 20px;
+	    padding: 5px 15px;
+		transition: var(--transition);
+
+	}
+
+	.search-input{
+	   border: none;
+	   outline: none;
+	   padding-left: 10px;
+	   padding: 4px 8px;
+	   font-size: 0.8125rem;
+	   color: var(--gris-dark);
+	   width: 140px;
+	   transition: width 0.4s ease;
+	}	
+	
+	.search-input:focus{
+	    width: 220px;
+	
+	}	
+
+	.search-button{
+	   background: none;
+	   border: none;
+	   cursor: pointer;
+	   display: flex;
+	   align-items: center;
+	}
+
+	.search-button svg{
+	   stroke: var(--gris-claro-light);
+	}
+
+	.site-title{
+	    text-align: center;
+	    color: var(--gris-tenue-light);
+	    font-size: 2.25rem;
+	    font-weight: 300;
+	    letter-spacing: -1px;
+	    text-transform: lowercase;
+		padding-top: 30px;
+	}
+
+	.site-title span{
+	    font-weight: 700;
+	    color: var(--gris-claro-tenue);
+	    margin-right: 10px;
+	    text-transform: uppercase;
+		
+	}
+
+	.search-wrapper:focus-within{
+	    background: var(--white);
+	    border-color: var(--primary-color);
+	    box-shadow: 0 0 0 0.0625rem var(--puebla-guinda)
+	}
+
+	.logos-right{
+		position: relative;
+	   display: flex;
+	   align-items: center;
+	    
+	}
+	
+	.logos-right img{
+	    height: 100px;
+	    width: auto;
+		padding-right: 35px;	
+	}
+
+ 
+
+    </style>
+</head>
+<body>
+
+<!-- ################## APARTADO DEL ENCABEZADO ################## -->
+    <header class="main-header">
+        <div class="logo-row"> <!--Logos del lado superior izquierdo-->
+	    <div class="logo-container">
+            <div class="logos-left">
+                <img src="IMG/logo_puebla_gob.svg" alt="Puebla Gobierno" loading="lazy">
+                <img src="IMG/DESARROLLO-SUSTENTABLE_02.png" alt="Desarrollo Sustentable" loading="lazy">
+            </div>
+
+			
+            <div class="frase-right"> <!--Logos del lado superior derecho -->
+                <img src="IMG/puebla_frases_gob.svg" alt="Por Amor a Puebla" loading="lazy">
+            </div>
+
+			<div class="logos-right"> <!--Boton de accesibilidad-->
+	      <button class="btn-accesibilidad-trigger" onclick="toggleAccesibility()">
+		<img id="logos-right" src="IMG/logo_accesibilidad.png" alt="Accesibilidad" loading="lazy">
+	      </button>	
+
+          <!--################## PANEL DE FUNCIONES DE ACCESIBILIDAD ################## -->
+<div class="accesibility-panel" id="accesibilityPanel">
+  <div class="acc-header">
+    <span class="acc-close" onclick="toggleAccesibility()">❌</span>
+    <h3>Accesibilidad</h3>
+    <span class="acc-reset" onclick="resetAccessibility()">🔄</span>
+  </div>
+
+  <div class="acc-options">
+    <button class="acc-btn" id="btn-tts"><span class="acc-icon">🗣️</span> Texto a Voz </button>
+    <button class="acc-btn" id="btn-invert"><span class="acc-icon">🌓</span> Invertir colores </button>
+    <button class="acc-btn" id="btn-gray"> <span class="acc-icon">⚪</span> Tonos grises </button>
+    <button class="acc-btn" id="btn-cursor"> <span class="acc-icon">🖱️</span> Cursor grande </button>
+    <button class="acc-btn" onclick="changeFontSize('increase')"> <span class="acc-icon">➕</span> Aumentar texto </button>
+    <button class="acc-btn" onclick="changeFontSize('decrease')"><span class="acc-icon">➖</span> Disminuir texto </button>
+    <button class="acc-btn" id="btn-links"> <span class="acc-icon">🔗</span> Subrayar enlaces </button>
+    <button class="acc-btn" id="btn-guide"> <span class="acc-icon">📏</span> Guía de lectura </button>
+    <button class="acc-btn" id="btn-stt"> <span class="acc-icon">🎤</span> Voz a texto </button>
+	  	</div>
+	</div>
+</div>    
+</div>
+	</div>
+        </div>
+	</div>
+</div>
+
+<!--################## SCRIPT DE VOZ A TEXTO ##################-->
+
+		<script>
+            // primero verificamos compatiblidad y corregimos errores de escritura
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if(!SpeechRecognition){
+                alert("Lo siento, tu navegador no soporta la API de reconocimiento de voz.");
+            } else {
+                const recognition = new SpeechRecognition();
+
+                //configuramos la voz
+                recognition.lang = 'es-ES';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                const buscador = document.getElementById('buscador');
+                const btn = document.getElementById('btn-stt');
+
+                //al hacer click al boton
+                btn.onclick = () => {
+                    recognition.start();
+                    btn.textContent = "Escuchando...";
+                };
+
+                //capturar el resultado
+                recognition.onresult = (event) => {
+                    const textoEscuchado = event.results[0][0].transcripr;
+                    buscador.value = textoEscuchado;
+                    console.log('Buscando: ', textoEscuchado);
+                };
+
+                //cambiar el texto del boton cuando termine de escuchar
+                recognition.onend = () =>{
+                    btn.textContent = "🎤 Voz a texto";
+                };
+
+                recognition.onerror = (event) =>{
+                    console.error("Error de reconocimiento: ", event.error);
+                    btn.textContent = "Dictar";
+                    alert("Hubo un error con el micrófono: " + event.error);
+                };
+
+                recognition.onspeechend = () => {
+                    recognition.stop();
+                };
+            }
+		</script>
+
+
+<!-- ################## APARTADO DEL MENU PRINCIPAL CON LOS ELEMENTOS DEL SUBMENU ##################  -->
+<nav class="nav-bar">
+    <div class="nav-container">        
+        <div class="nav-menu">
+            <ul>
+                <li class="nav-item">
+					<a href="index.html" id="nav-home">Inicio</a>
+				</li>
+                <li class="nav-item">
+                    <a href="desarrollo.html" id="nav-urban">Desarrollo Urbano</a>
+                    <ul class="submenu">
+                        <li><a href="desarrollo.html?cat=progrMetro" id="nav-sub-metro">Programa Metropolitano</a></li>
+                        <li><a href="desarrollo.html?cat=progrEst" id="nav-sub-est">Programa Estatal</a></li>
+                        <li><a href="desarrollo.html?cat=munic" id="nav-sub-mun">Municipios</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="gestion.html" id="nav-soil">Gestión de suelos</a>
+                    <ul class="submenu">
+                        <li><a href="#">Subregionales</a></li>
+                        <li><a href="#">Ordenamiento ecológico</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="biodiversidad.html" id="nav-bio" style="color: var(--puebla-guinda-light); font-weight: bold;">Biodiversidad</a>
+                    <ul class="submenu">
+                        <li><a href="#">Áreas Naturales Protegidas</a></li>
+                        <li><a href="#">Áreas de Donación Voluntaria C</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a href="sig.html" id="nav-sig">Sistemas de Integración Geográfica</a></li>
+            </ul>
+        </div>
+
+        <script src="JS/panel_acciones.js"></script>
+
+
+            <button class="qr-btn-trigger" onclick="toggleQRModal()" title="Generar código QR de esta página" aria-label="Generar QR">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <path d="M3 14h7v7H3z"></path>
+        <path d="M10 10h4v4h-4z" fill="currentColor" stroke="none"></path> 
+    </svg>
+</button>
+
+<button class="lang-btn-trigger" id="btn-lang" onclick="toggleLanguage()" title="Cambiar idioma / Change language" aria-label="Cambiar idioma">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>
+    <span id="lang-text" style="font-size: 10px; font-weight: bold; margin-left: 2px;">ES</span>
+</button>
+
+
+<button class="chat-btn-trigger" onclick="toggleChat()" title="Asistente Virtual" aria-label="Chatbot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+</button>
+
+<div id="chatModal" class="chat-window">
+    <div class="chat-header">
+        <div class="chat-title">
+            <span>🤖</span> Asistente SITEP
+        </div>
+        <button class="chat-close" onclick="toggleChat()">✖</button>
+    </div>
+    
+    <div class="chat-body" id="chatBody">
+        <div class="message bot-msg">
+            <p>¡Hola! Soy el asistente virtual del SITEP. ¿En qué tema tienes dudas?</p>
+        </div>
+        </div>
+
+<div class="chat-options" id="chatOptions"></div>
+
+<div class="chat-input-area">
+    <input type="text" id="userInput" placeholder="Escribe tu duda aquí..." onkeypress="checkEnter(event)">
+    <button onclick="handleUserText()" class="send-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+        </svg>
+    </button>
+</div>
+</div>
+
+
+
+<!-- ################## APARTADO DEL BUSCADOR ################## -->
+        <div class="search-wrapper">
+            <input type="text" class="search-input" placeholder="Buscar..." aria-label="Buscar" id="buscador">
+            <button class="search-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </div>
+<!-- seccion de responsivo del menu -->
+        <div class="hamburger">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </div>
+    </div>
+</nav>
+
+<!-- ################## SCRIPT DEL RESPONSIVO DEL MENU ################## -->
+<script src="JS/menu_resp.js"></script>
+
+<!--Cuerpo de la pagina-->
+
+    </header>
+
+    <main class="main-content">
+
+        <div class="bio-content-wrapper">
+            
+            <section class="bio-info-box">
+                <h3>Riqueza Biológica de Puebla</h3>
+                <div class="bio-text-cols">
+                    <p>En materia de biodiversidad, el Estado de Puebla posee un espectro de características dominantes para albergar vastos tesoros bióticos. La posición geográfica de Puebla de encrucijada de sistemas montañosos define la diversidad biológica en gran medida.</p>
+                    <p>Con una gran variedad de climas y suelos, la configuración geomorfológica permite condiciones que van desde selvas hasta zonas áridas.</p>
+                </div>
+            </section>
+
+            <h3 class="section-title">Ecosistemas Principales</h3>
+            <section class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="gallery-img-container"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Sierra_Norte_de_Puebla.jpg/640px-Sierra_Norte_de_Puebla.jpg" alt="Sierra Norte"></div>
+                    <span class="gallery-caption">Sierra Norte</span>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img-container"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Reserva_de_la_Biosfera_Tehuac%C3%A1n-Cuicatl%C3%A1n.jpg/640px-Reserva_de_la_Biosfera_Tehuac%C3%A1n-Cuicatl%C3%A1n.jpg" alt="Reserva Biosfera"></div>
+                    <span class="gallery-caption">Reserva de la Biosfera</span>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img-container"><img src="https://inaturalist-open-data.s3.amazonaws.com/photos/10940361/large.jpg" alt="Fauna Endémica"></div>
+                    <span class="gallery-caption">Fauna Endémica</span>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img-container"><img src="https://puebla.travel/images/blog/valle-de-piedrasencimadas/piedras-encimadas-puebla.jpg" alt="Valsequillo"></div>
+                    <span class="gallery-caption">Valsequillo</span>
+                </div>
+            </section>
+
+            <h3 class="section-title" style="text-transform: uppercase; font-size: 1rem; color: var(--gris);">Documentación</h3>
+            <section class="docs-section">
+                <div class="docs-grid">
+                    
+                    <div class="pdf-real-container">
+                        <div class="pdf-real-header">
+                            <span>Manual_Ejemplo.pdf (Online)</span>
+                            <a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" download class="pdf-download-btn">⬇ Descargar</a>
+                        </div>
+                        <iframe 
+                            class="pdf-iframe" 
+                            src="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" 
+                            type="application/pdf">
+                        </iframe>
+                    </div>
+
+                    <div class="pdf-real-container">
+                        <div class="pdf-real-header">
+                            <span>Informe_Anual_2025.pdf</span>
+                            <a href="DOCS/tu_archivo.pdf" download class="pdf-download-btn">⬇ Descargar</a>
+                        </div>
+                        
+                        <iframe 
+                            class="pdf-iframe" 
+                            src="DOCS/tu_archivo.pdf" 
+                            type="application/pdf">
+                            <div class="pdf-fallback">
+                                Tu navegador no puede previsualizar este PDF. 
+                                <a href="DOCS/tu_archivo.pdf">Descárgalo aquí</a>.
+                            </div>
+                        </iframe>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+
+
+<!-- ################## APARTADO DEL PIE DE PAGINA ################## -->
+
+<footer class="main-footer">
+    <div class="footer-content">
+	<div class="footer-branding">
+	    <img src="IMG/Escudo_pie.svg" alt="Gobierno de Puebla" class="footer-logo-main" loading="lazy"> <!-- imagen del logo de puebla -->
+	</div>
+	   <ul class="footer-links-col">
+		<li> <a href="https://planeader.puebla.gob.mx/"> PLAN ESTATAL DE DESARROLLO </a> </li>
+		<li> <a href=""> PERIÓDICO OFIICAL DEL ESTADO</a> </li>
+		<li> <a href=""> . </a> </li>	
+	  </ul>
+    </div>	
+	
+    <!-- imagen del gobierno de puebla-->
+</div>
+    <img src="IMG/footer_puebla_gob_2025_des.svg"  class="cop" loading="lazy" />
+</footer>
+<script src="JS/mapa.js"></script>
+<script src="JS/anim_num.js"></script>
+<script src="JS/clima.js"></script>
+
+</body>
+</html>

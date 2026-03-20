@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Código QR Infinito</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* CSS para darle un diseño limpio y moderno */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h2 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccd0d5;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #0066ff;
+        }
+        button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0052cc;
+        }
+        #qr-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        .nota {
+            font-size: 13px;
+            color: #666;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Generador QR Estático</h2>
+        <input type="text" id="texto-qr" placeholder="Pega tu enlace (ej. https://google.com)">
+        <button onclick="generarQR()">Crear Código QR</button>
+        
+        <div id="qr-container"></div>
+        
+        <p class="nota">✅ Este código QR es <strong>estático</strong>. No usa intermediarios, no requiere suscripciones y <strong>nunca caducará</strong>.</p>
+    </div>
+
+    <script>
+        // Lógica en JavaScript
+        function generarQR() {
+            const inputElemento = document.getElementById("texto-qr");
+            const contenedorQR = document.getElementById("qr-container");
+            const texto = inputElemento.value.trim();
+            
+            // Limpiamos el contenedor por si ya había un QR generado antes
+            contenedorQR.innerHTML = "";
+
+            // Validamos que el usuario haya escrito algo
+            if (texto === "") {
+                alert("Por favor, ingresa un enlace o texto válido.");
+                return;
+            }
+
+            // Generamos el QR usando la librería
+            new QRCode(contenedorQR, {
+                text: texto,
+                width: 200,      // Ancho en píxeles
+                height: 200,     // Alto en píxeles
+                colorDark : "#000000",  // Color de los cuadros del QR
+                colorLight : "#ffffff", // Color del fondo
+                correctLevel : QRCode.CorrectLevel.H // Nivel de corrección de errores (H = alto)
+            });
+        }
+    </script>
+
+</body>
+</html>

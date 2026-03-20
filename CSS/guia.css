@@ -1,0 +1,43 @@
+/* ========================================= */
+/* CORRECCIÓN DE PESTAÑAS (TABS) DEL MAPA    */
+/* ========================================= */
+
+.tabs-container {
+    display: flex;
+    gap: 10px; /* Separación entre los botones */
+    margin-bottom: 20px;
+    border-bottom: none !important; /* Quitamos la línea inferior del contenedor general */
+    padding-bottom: 0;
+    overflow-x: auto;
+}
+
+/* Estado Inactivo (Colores inversos: Fondo blanco, texto guinda) */
+.tab-btn {
+    background-color: var(--white) !important; 
+    color: var(--puebla-guinda) !important;
+    border: 2px solid var(--puebla-guinda) !important; /* Contorno guinda limpio */
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    border-radius: 6px !important; /* Bordes ligeramente redondeados */
+    text-align: center;
+    min-width: 140px;
+    box-shadow: none !important;
+}
+
+/* Efecto Hover para botones inactivos */
+.tab-btn:hover {
+    background-color: var(--white-tenue) !important;
+    color: var(--puebla-oscuro) !important;
+}
+
+/* Estado Activo (Fondo guinda, texto blanco) */
+.tab-btn.active {
+    background-color: var(--puebla-guinda) !important; 
+    color: var(--white) !important; 
+    border: 2px solid var(--puebla-guinda) !important; /* Mismo borde para evitar que el botón brinque al hacer clic */
+    box-shadow: 0 4px 8px var(--black-tenue) !important; /* Sombra sutil para que resalte sobre el mapa */
+}
